@@ -206,3 +206,27 @@ class Model(object, metaclass=ABCMeta):
 
         """
         pass
+
+#
+#   Exception Classes
+#
+
+class ModelException(Exception):
+    """
+    Base Class for Model Exceptions
+    """
+    pass
+
+
+class InvalidParameterException(ModelException):
+    """
+    Thrown when an Invalid Parameter is given
+    """
+    pass
+
+
+class InvalidHyperParameterException(ModelException):
+    """
+    Thrown when an Invalid Hyper-Parameter is given
+    """
+    pass

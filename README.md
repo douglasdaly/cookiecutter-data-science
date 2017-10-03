@@ -1,4 +1,4 @@
-# Doug Daly's Cookiecutter Data Science Project Template
+# Doug's Cookiecutter Data Science Project Template
 
 _A logical, reasonably standardized, but flexible project structure for doing and sharing data science work._
 
