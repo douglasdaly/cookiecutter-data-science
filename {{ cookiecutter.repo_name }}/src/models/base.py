@@ -53,7 +53,7 @@ class Model(object, metaclass=ABCMeta):
         :param dict params: Full parameters dictionary to use
 
         """
-        self._parameters = params
+        raise NotImplementedError()
 
     def add_parameter(self, param, value):
         """ Adds a single parameter to the parameter set
@@ -62,7 +62,8 @@ class Model(object, metaclass=ABCMeta):
         :param value: Value for the given parameter
 
         """
-        raise NotImplementedError()
+        if self._check_parameter(param, value)[0]:
+            self._parameters[param] = value
 
     def remove_parameter(self, param):
         """ Removes the specified parameter from the model parameters
@@ -79,17 +80,19 @@ class Model(object, metaclass=ABCMeta):
 
         return ret
 
-    def _check_parameter(self, param, value):
+    def _check_parameter(self, param, value, suppress_exceptions=False):
         """ Checks if the given parameter and value combination are valid for this model
 
         :param str param: Parameter name
         :param value: Parameter value
+        :param bool suppress_exceptions: Whether or not to ignore exceptions (Default is False)
 
         :return: If the given parameter and value combination are valid for this model
-        :rtype: bool
+        :rtype: bool, str
 
         """
-        raise NotImplementedError()
+        except_type = None if suppress_exceptions else InvalidParameterException
+        return self.__param_check_helper(param, value, self._parameters, except_type)
 
     @property
     def hyper_parameters(self):
@@ -108,7 +111,7 @@ class Model(object, metaclass=ABCMeta):
         :param hyper_params:
 
         """
-        self._hyper_parameters = hyper_params
+        raise NotImplementedError()
 
     def add_hyper_parameter(self, hyper_param, value):
         """ Adds a single hyper-parameter to the hyper-parameter set
@@ -117,7 +120,8 @@ class Model(object, metaclass=ABCMeta):
         :param value: Value for the given hyper-parameter
 
         """
-        raise NotImplementedError()
+        if self._check_hyper_parameter(hyper_param, value)[0]:
+            self._hyper_parameters[hyper_param] = value
 
     def remove_hyper_parameter(self, hyper_param):
         """ Removes the specified hyper-parameter from the model hyper-parameters
@@ -134,17 +138,66 @@ class Model(object, metaclass=ABCMeta):
 
         return ret
 
-    def _check_hyper_parameter(self, hyper_param, value):
+    def _check_hyper_parameter(self, hyper_param, value, suppress_exceptions=False):
         """ Checks if the given hyper-parameter and value combination are valid for this model
 
         :param str hyper_param: Hyper-Parameter name
         :param value: Hyper-Parameter value
+        :param bool suppress_exceptions: Whether or not to ignore exceptions (Default is to False)
 
         :return: If the given hyper-parameter and value combination are valid for this model
-        :rtype: bool
+        :rtype: bool, str
 
         """
-        raise NotImplementedError()
+        except_type = None if suppress_exceptions else InvalidHyperParameterException
+        return self.__param_check_helper(hyper_param, value, self._opts_hyper_parameters, except_type)
+
+    @staticmethod
+    def __param_check_helper(param, value, option_dict, exception_type=None):
+        """ Helper function for checking given Parameter and Value against a dictionary of Options
+
+        :param str param: Name of the Parameter to check
+        :param value: Value to check for the given Parameter
+        :param dict option_dict: Dictionary of allowed parameters and types
+        :param exception_type: Type of exception to throw on errors (default is ModelException, None to suppress)
+
+        :return: Whether or not the given parameter and value are valid
+        :rtype: bool, str
+
+        """
+        if exception_type is not None:
+            suppress_exceptions = False
+        else:
+            suppress_exceptions = True
+
+        if param not in option_dict.keys():
+            err_str = "No parameter named: " + param
+            if not suppress_exceptions:
+                raise exception_type(err_str)
+            return False, err_str
+
+        param_opt = option_dict[param]
+        if not isinstance(value, param_opt.value_type):
+            err_str = "Invalid type for " + param + ": found " + str(type(value)) + ", expected: " + \
+                      str(param_opt.value_type)
+            if not suppress_exceptions:
+                raise exception_type(err_str)
+            return False, err_str
+
+        if param_opt.value_bounds is not None:
+            if param_opt.value_bounds[0] is not None and value < param_opt.value_bounds[0]:
+                err_str = "Invalid value given for " + param + ": Under min value of " + str(param_opt.value_bounds[0])
+                if not suppress_exceptions:
+                    raise exception_type(err_str)
+                return False, err_str
+
+            if param_opt.value_bounds[1] is not None and value > param_opt.value_bounds[1]:
+                err_str = "Invalid value given for " + param + ": Over max value of " + str(param_opt.value_bounds[1])
+                if not suppress_exceptions:
+                    raise exception_type(err_str)
+                return False, err_str
+
+        return True, None
 
     @property
     def results(self):
@@ -206,6 +259,30 @@ class Model(object, metaclass=ABCMeta):
 
         """
         pass
+
+    # - Internal Classes
+
+    class _ParameterOption(object):
+        """
+        Parameter Option internal class
+        """
+
+        def __init__(self, name, value_type, value_required=True, value_bounds=None, value_default=None):
+            """ Default Constructor
+
+            :param str name: Name of the Parameter these options are for
+            :param type value_type: The type of value for this parameter
+            :param bool value_required: Whether or not this is a required parameter (default is True)
+            :param tuple value_bounds: [Optional] Bounds for this parameter (default is None)
+            :param value_default: [Optional] Default value for this parameter (default is None)
+
+            """
+            self.name = name
+            self.value_type = value_type
+            self.value_required = value_required
+            self.value_bounds = value_bounds
+            self.value_default = value_default
+
 
 #
 #   Exception Classes
