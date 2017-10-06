@@ -53,7 +53,8 @@ class Model(object, metaclass=ABCMeta):
         :param dict params: Full parameters dictionary to use
 
         """
-        raise NotImplementedError()
+        for k, v in params.items():
+            self.add_parameter(k, v)
 
     def add_parameter(self, param, value):
         """ Adds a single parameter to the parameter set
@@ -108,10 +109,11 @@ class Model(object, metaclass=ABCMeta):
     def hyper_parameters(self, hyper_params):
         """ Sets the hyper-parameters for this model
 
-        :param hyper_params:
+        :param dict hyper_params: Hyper-parameter dictionary to set
 
         """
-        raise NotImplementedError()
+        for k, v in hyper_params.items():
+            self.add_hyper_parameter(k, v)
 
     def add_hyper_parameter(self, hyper_param, value):
         """ Adds a single hyper-parameter to the hyper-parameter set
@@ -199,6 +201,62 @@ class Model(object, metaclass=ABCMeta):
 
         return True, None
 
+    def _check_init_parameters(self, use_defaults=True):
+        """ Checks that required parameters are set and (optionally) initializes any un-set to default values
+
+        :param bool use_defaults: Use default values for required parameters that aren't set
+
+        :return: Whether or not the parameters in place are sufficient
+        :rtype: bool
+
+        """
+        additional = self.__check_init_params_helper(self.parameters, self._opts_parameters, use_defaults)
+        if additional is not None:
+            for k, v in additional.items():
+                self._parameters[k] = v
+            return True
+        else:
+            return False
+
+    def _check_init_hyper_parameters(self, use_defaults=True):
+        """ Checks that required hyper-parameters are set and (optionally) initializes any un-set to default values
+
+        :param bool use_defaults: Use default values for required hyper-parameters that aren't set
+
+        :return: Whether or not the hyper-parameters in place are sufficient
+        :rtype: bool
+
+        """
+        additional = self.__check_init_params_helper(self.hyper_parameters, self._opts_hyper_parameters, use_defaults)
+        if additional is not None:
+            for k, v in additional.items():
+                self._hyper_parameters[k] = v
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def __check_init_params_helper(params, opt_params, use_defaults=True):
+        """ Helper function for checking set parameter and hyper-parameters
+
+        :param dict params: Params to check
+        :param dict opt_params: Params options dictionary to check against
+        :param bool use_defaults: Use default values for required params that are unset
+
+        :return: Additional params to add (None on error)
+        :rtype: dict
+
+        """
+        dict_additional = dict()
+        for k, v in opt_params.items():
+            if v.value_required:
+                if k not in params.keys():
+                    if use_defaults and v.value_default is not None:
+                        dict_additional[k] = v.value_default
+                    else:
+                        return None
+        return dict_additional
+
     @property
     def results(self):
         """ Result metrics from the training process
@@ -208,6 +266,27 @@ class Model(object, metaclass=ABCMeta):
 
         """
         return self._results
+
+    # Save/Load Methods
+
+    def save(self, tag):
+        """ Saves this models parameters, hyper-parameters, etc. to file
+
+        :param str tag: Tag to use to save the model data
+
+        :return: Success of the save
+        :rtype: bool
+
+        """
+        raise NotImplementedError()
+
+    def load(self, tag):
+        """ Loads a model, parameters, hyper-parameters, etc. from a save
+
+        :param str tag: Tag to use to load the model data
+
+        """
+        raise NotImplementedError()
 
     # Abstract Methods
 
