@@ -23,6 +23,7 @@ endif
 ## Install Python Dependencies
 requirements: test_environment
 	pip install -r requirements.txt
+	pip install -e .
 
 ## Make Dataset
 data: requirements

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Base model class
-
 Implements the Model abstract class which is extended for specific
 model implementations.
 

@@ -4,8 +4,11 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
+SPHINXAPIDOC  = sphinx-apidoc
 PAPER         =
 BUILDDIR      = _build
+GENERATEDIR   = _generated
+CODEDIR       = src
 
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
@@ -40,8 +43,14 @@ help:
 
 clean:
 	-rm -rf $(BUILDDIR)/*
+	-rm -rf $(GENERATEDIR)/*.rst
 
-html:
+generate:
+	$(SPHINXAPIDOC) -o $(GENERATEDIR) -e -f ../$(CODEDIR)
+	@echo
+	@echo "Code documentation files generated. The .rst files are in $(GENERATEDIR)."
+
+html: generate
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
