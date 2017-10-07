@@ -26,7 +26,7 @@ requirements: test_environment
 	pip install -e .
 
 ## Make Dataset
-data: requirements
+data:
 	$(PYTHON_INTERPRETER) scripts/make_dataset.py
 
 ## Delete all compiled Python files

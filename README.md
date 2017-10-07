@@ -91,13 +91,20 @@ The directory structure of your new project looks like this:
 └── tox.ini            <- tox file with settings for running tox; see tox.testrun.org
 ```
 
-### Setting up the project virtualenv and installing python dependencies
+### Setting up the project virtualenv
 ------------
 
-    make configure
+    make create_environment
+
+
+### Installing dependencies
+------------
+
+    make requirements
 
 
 ### Running the tests
 ------------
 
     py.test tests
+
