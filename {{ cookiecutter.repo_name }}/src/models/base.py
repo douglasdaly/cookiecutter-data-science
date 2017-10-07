@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-base.py
+Base model class
 
-    Base model class
+Implements the Model abstract class which is extended for specific
+model implementations.
 
-@author: Douglas Daly
-@date: 9/30/2017
+Also implements the ModelException, ParameterException and
+HyperParameterException exceptions.
+
 """
 #
 #   Imports
@@ -20,11 +22,21 @@ from abc import ABCMeta, abstractmethod
 class Model(object, metaclass=ABCMeta):
     """
     Base Model Class
+
+    Attributes
+    ----------
+    parameters : dict
+        Dictionary of parameters for this model with their associated
+        values.
+    hyperparameters: dict
+        Dictionary of hyper-parameters for training this model with
+        their associated values.
+    results: dict
+        Dictionary of training results and their associated values.
+
     """
 
     def __init__(self):
-        """ Default Constructor
-        """
         self._parameters = dict()
         self._hyper_parameters = dict()
 
@@ -39,10 +51,6 @@ class Model(object, metaclass=ABCMeta):
     @property
     def parameters(self):
         """ Parameters which are currently set for this model
-
-        :return: Parameters dictionary
-        :rtype: dict
-
         """
         return self._parameters
 
@@ -50,9 +58,23 @@ class Model(object, metaclass=ABCMeta):
     def parameters(self, params):
         """ Sets the parameters for this model
 
-        :param dict params: Full parameters dictionary to use
+        Parameters
+        ----------
+        params: dict
+            Full parameters dictionary to use
+
+        Raises
+        ------
+        InvalidParameterException
+            If one of the given parameters and/or value given is not
+            valid.
+
+        See Also
+        --------
+        parameters, add_parameter, remove_parameter
 
         """
+        self._parameters.clear()
         for k, v in params.items():
             self.add_parameter(k, v)
 
@@ -92,16 +114,14 @@ class Model(object, metaclass=ABCMeta):
         :rtype: bool, str
 
         """
-        except_type = None if suppress_exceptions else InvalidParameterException
-        return self.__param_check_helper(param, value, self._parameters, except_type)
+        except_type = None if suppress_exceptions \
+            else InvalidParameterException
+        return self.__param_check_helper(param, value, self._parameters,
+                                         except_type)
 
     @property
     def hyper_parameters(self):
         """ Hyper-parameters which are currently set for this model
-
-        :return: Hyper-parameters dictionary
-        :rtype: dict
-
         """
         return self._hyper_parameters
 
@@ -112,11 +132,12 @@ class Model(object, metaclass=ABCMeta):
         :param dict hyper_params: Hyper-parameter dictionary to set
 
         """
+        self._hyper_parameters.clear()
         for k, v in hyper_params.items():
             self.add_hyper_parameter(k, v)
 
     def add_hyper_parameter(self, hyper_param, value):
-        """ Adds a single hyper-parameter to the hyper-parameter set
+        """ Adds a single hyper-parameter
 
         :param str hyper_param: Hyper-parameter to add
         :param value: Value for the given hyper-parameter
@@ -126,7 +147,7 @@ class Model(object, metaclass=ABCMeta):
             self._hyper_parameters[hyper_param] = value
 
     def remove_hyper_parameter(self, hyper_param):
-        """ Removes the specified hyper-parameter from the model hyper-parameters
+        """ Removes the specified hyper-parameter
 
         :param str hyper_param: Name of the hyper-parameter to remove
 
@@ -141,7 +162,7 @@ class Model(object, metaclass=ABCMeta):
         return ret
 
     def _check_hyper_parameter(self, hyper_param, value, suppress_exceptions=False):
-        """ Checks if the given hyper-parameter and value combination are valid for this model
+        """ Checks if the given hyper-parameter is valid
 
         :param str hyper_param: Hyper-Parameter name
         :param value: Hyper-Parameter value
@@ -156,16 +177,7 @@ class Model(object, metaclass=ABCMeta):
 
     @staticmethod
     def __param_check_helper(param, value, option_dict, exception_type=None):
-        """ Helper function for checking given Parameter and Value against a dictionary of Options
-
-        :param str param: Name of the Parameter to check
-        :param value: Value to check for the given Parameter
-        :param dict option_dict: Dictionary of allowed parameters and types
-        :param exception_type: Type of exception to throw on errors (default is ModelException, None to suppress)
-
-        :return: Whether or not the given parameter and value are valid
-        :rtype: bool, str
-
+        """ Helper function for checking given Parameter and Value
         """
         if exception_type is not None:
             suppress_exceptions = False
@@ -202,7 +214,7 @@ class Model(object, metaclass=ABCMeta):
         return True, None
 
     def _check_init_parameters(self, use_defaults=True):
-        """ Checks that required parameters are set and (optionally) initializes any un-set to default values
+        """ Checks that required parameters are set
 
         :param bool use_defaults: Use default values for required parameters that aren't set
 
@@ -219,7 +231,7 @@ class Model(object, metaclass=ABCMeta):
             return False
 
     def _check_init_hyper_parameters(self, use_defaults=True):
-        """ Checks that required hyper-parameters are set and (optionally) initializes any un-set to default values
+        """ Checks that required hyper-parameters are set
 
         :param bool use_defaults: Use default values for required hyper-parameters that aren't set
 
@@ -237,7 +249,7 @@ class Model(object, metaclass=ABCMeta):
 
     @staticmethod
     def __check_init_params_helper(params, opt_params, use_defaults=True):
-        """ Helper function for checking set parameter and hyper-parameters
+        """ Helper function for checking parameters
 
         :param dict params: Params to check
         :param dict opt_params: Params options dictionary to check against
@@ -259,7 +271,7 @@ class Model(object, metaclass=ABCMeta):
 
     @property
     def results(self):
-        """ Result metrics from the training process
+        """ Result metrics
 
         :return: Results dictionary
         :rtype: dict
@@ -270,7 +282,7 @@ class Model(object, metaclass=ABCMeta):
     # Save/Load Methods
 
     def save(self, tag):
-        """ Saves this models parameters, hyper-parameters, etc. to file
+        """ Saves this model
 
         :param str tag: Tag to use to save the model data
 
@@ -281,7 +293,7 @@ class Model(object, metaclass=ABCMeta):
         raise NotImplementedError()
 
     def load(self, tag):
-        """ Loads a model, parameters, hyper-parameters, etc. from a save
+        """ Loads a model
 
         :param str tag: Tag to use to load the model data
 
@@ -292,7 +304,7 @@ class Model(object, metaclass=ABCMeta):
 
     @abstractmethod
     def construct(self, **kwargs):
-        """ Constructs the model from the set parameters
+        """ Constructs the model
 
         :param kwargs: Additional options for construction
 
@@ -304,7 +316,7 @@ class Model(object, metaclass=ABCMeta):
 
     @abstractmethod
     def run(self):
-        """ Runs the primary preset training routine
+        """ Runs the primary training routine
 
         :return: Result of training run (success or failure)
         :rtype: bool
@@ -314,7 +326,7 @@ class Model(object, metaclass=ABCMeta):
 
     @abstractmethod
     def train(self, X, y, **kwargs):
-        """ Trains the model on the given X and y Data
+        """ Trains the model on the given data
 
         :param X: Training data features
         :param y: Training data values/labels
@@ -328,7 +340,7 @@ class Model(object, metaclass=ABCMeta):
 
     @abstractmethod
     def predict(self, X, **kwargs):
-        """ Uses the trained model to predict outputs for the given features
+        """ Predict outputs for the given features
 
         :param X: Features to predict outputs for
         :param kwargs: Additional options for prediction
