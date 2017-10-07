@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-make_dataset.py
+Make Data Set Script
 
-    Script which acquires the data set and pre-processes it for exploration and feature engineering.
+Script which acquires the data set and pre-processes it for exploration
+and feature engineering.
 
-@author: Douglas Daly
-@date: 10/2/2017
 """
 #
 #   Imports
@@ -14,6 +13,7 @@ import os
 import click
 import logging
 from dotenv import find_dotenv, load_dotenv
+
 
 #
 #   Function Definitions
@@ -25,12 +25,16 @@ def main():
         cleaned data ready to be analyzed (saved in ../processed).
     """
     logger = logging.getLogger(__name__)
+    logger.info("Starting data acquisition...")
 
     # CODE TO ACQUIRE DATA
+
+
 
 #
 #   Script Entry-Point
 #
+
 if __name__ == '__main__':
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(level=logging.INFO, format=log_fmt)
