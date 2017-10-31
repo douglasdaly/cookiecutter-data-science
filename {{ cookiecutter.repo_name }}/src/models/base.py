@@ -10,6 +10,8 @@ InvalidHyperParameterException exceptions.
 #
 #   Imports
 #
+import os
+import pickle
 from abc import ABCMeta, abstractmethod
 
 
@@ -474,6 +476,26 @@ class Model(object, metaclass=ABCMeta):
 
     # Save/Load Methods
 
+    def __get_model_directory(self, tag):
+        """ Gets the storage Directory
+
+        Returns the directory where this models `parameters`,
+        `hyper_parameters` as well as any other data required for the model
+        is stored under a unique `tag` name.
+
+        Parameters
+        ----------
+        tag: str
+            Tag to use for the directory
+
+        Returns
+        -------
+        str
+            Path to the model storage directory
+
+        """
+        raise NotImplementedError()
+
     def save(self, tag, overwrite_existing=False):
         """ Saves this model
 
@@ -495,15 +517,36 @@ class Model(object, metaclass=ABCMeta):
             Success or failure of the save
 
         """
-        raise NotImplementedError()
+        model_dir = self.__get_model_directory(tag)
+        if not model_dir:
+            os.mkdir(model_dir)
+
+        parameters_file = os.path.join(model_dir, "parameters.pkl")
+        if os.path.exists(parameters_file) and not overwrite_existing:
+            return False
+        with open(parameters_file, 'wb') as fout:
+            pickle.dump(self._parameters, fout)
+
+        hyper_parameters_file = os.path.join(model_dir, "hyper_parameters.pkl")
+        if os.path.exists(hyper_parameters_file) and not overwrite_existing:
+            return False
+        with open(hyper_parameters_file, 'wb') as fout:
+            pickle.dump(self._hyper_parameters, fout)
+
+        return self._save_model_helper(model_dir)
 
     @abstractmethod
-    def _save_model_helper(self):
+    def _save_model_helper(self, directory):
         """ Saves model objects
 
         Helper function to save model-specific data/objects other than
         `parameters` or `hyper_parameters` that are needed  to
         reconstruct the model.
+
+        Parameters
+        ----------
+        directory: str
+            Location to save the model to
 
         Returns
         -------
@@ -524,16 +567,38 @@ class Model(object, metaclass=ABCMeta):
         tag: str
             Tag to use to load the model data
 
+        Returns
+        -------
+        bool
+            Result of the model load process
+
         """
-        raise NotImplementedError()
+        model_dir = self.__get_model_directory(tag)
+        if not model_dir:
+            return False
+
+        parameters_file = os.path.join(model_dir, "parameters.pkl")
+        with open(parameters_file, 'rb') as fin:
+            self._parameters = pickle.load(fin)
+
+        hyper_parameters_file = os.path.join(model_dir, "hyper_parameters.pkl")
+        with open(hyper_parameters_file, 'rb') as fin:
+            self._hyper_parameters = pickle.load(fin)
+
+        return self._load_model_helper(model_dir)
 
     @abstractmethod
-    def _load_model_helper(self):
+    def _load_model_helper(self, directory):
         """ Loads model objects
 
         Helper function to load model-specific data/objects other than
         `parameters` or `hyper_parameters` that are needed to
         reconstruct the model.
+
+        Parameters
+        ----------
+        directory: str
+            Directory to load the model from
 
         Returns
         -------
