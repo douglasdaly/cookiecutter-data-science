@@ -535,7 +535,6 @@ class Model(object, metaclass=ABCMeta):
 
         return self._save_model_helper(model_dir)
 
-    @abstractmethod
     def _save_model_helper(self, directory):
         """ Saves model objects
 
@@ -554,7 +553,7 @@ class Model(object, metaclass=ABCMeta):
             Success or failure of the save
 
         """
-        pass
+        return True
 
     def load(self, tag):
         """ Loads a model
@@ -587,7 +586,6 @@ class Model(object, metaclass=ABCMeta):
 
         return self._load_model_helper(model_dir)
 
-    @abstractmethod
     def _load_model_helper(self, directory):
         """ Loads model objects
 
@@ -606,7 +604,7 @@ class Model(object, metaclass=ABCMeta):
             Success or failure of the load
 
         """
-        pass
+        return True
 
     # Abstract Model Methods
 
