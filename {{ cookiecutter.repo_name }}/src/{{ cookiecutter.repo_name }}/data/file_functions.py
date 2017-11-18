@@ -18,15 +18,31 @@ import pickle
 #   Function Definitions
 #
 
-def save_data_as_pickle(data, filename, overwrite=False):
+def save_data_to_pickle(data, filename, overwrite=False):
     """ Saves the given Data as a Pickle file
 
-    :param object data: Data object to save
-    :param str filename: File to save to
-    :param bool overwrite: [Optional] Overwrite existing? (Default is False)
+    Saves the given data object, whatever it may be (but must be a pickle-able
+    object) to the given filename with the optional ability to overwrite an
+    existing file.
 
-    :return: Success/failure of the Save
-    :rtype: bool
+    Parameters
+    ----------
+    data: object
+        Data to save to the pickle file
+    filename: str
+        File to save the object to
+
+    overwrite: bool, optional
+        Whether or not to overwrite the file if it already exists
+
+    Returns
+    -------
+    bool
+        Result status of the save operation
+
+    See Also
+    --------
+    load_data_from_pickle
 
     """
     if os.path.exists(filename) and not overwrite:
@@ -41,10 +57,21 @@ def save_data_as_pickle(data, filename, overwrite=False):
 def load_data_from_pickle(filename):
     """ Loads data from a Pickled file
 
-    :param str filename: File to load
+    Loads an object saved via pickle to the given filename.
 
-    :return: Data requested from pickled file (None on error)
-    :rtype: object
+    Parameters
+    ----------
+    filename: str
+        File to load the pickled object from
+
+    Returns
+    -------
+    object
+        Object saved in the pickled file
+
+    See Also
+    --------
+    save_data_to_pickle
 
     """
     if not os.path.exists(filename):

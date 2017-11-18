@@ -20,11 +20,20 @@ import pandas as pd
 def parse_csv_as_dataframe(filename, index=None):
     """ Parses a CSV file into a DataFrame
 
-    :param str filename: File to parse
-    :param str index: [Optional] Column to set as index (Default is None)
+    Parses the contents of the given CSV file into a pandas DataFrame
 
-    :return: DataFrame representation of the file data
-    :rtype: pandas.DataFrame
+    Parameters
+    ----------
+    filename: str
+        CSV file to load data from
+
+    index: str, optional
+        Column name to set as the DataFrame's index
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame of the file data requested
 
     """
     df_data = pd.read_csv(filename)
