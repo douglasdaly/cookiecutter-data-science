@@ -63,8 +63,9 @@ The directory structure of your new project looks like this:
 │
 ├── scripts            <- Folder for scripts used in this project for various tasks
 │   └── build_features.py
-│   └── make_dataset.py
+│   └── get_data.py
 │   └── predict_model.py
+│   └── process_data.py
 │   └── train_model.py
 │
 ├── src                <- Source code for library used in this project and installed as a
@@ -74,6 +75,10 @@ The directory structure of your new project looks like this:
 │   │
 │   ├── data           <- Functions/Classes related to acquiring the data
 │   │   └── __init__.py
+│   │   └── file_functions.py
+│   │   └── get_data_functions.py
+│   │   └── parse.py
+│   │   └── process.py
 │   │
 │   ├── features       <- Scripts to turn raw data into features for modeling
 │   │   └── __init__.py
