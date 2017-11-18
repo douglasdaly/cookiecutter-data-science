@@ -41,8 +41,8 @@ The directory structure of your new project looks like this:
 ├── README.md          <- The top-level README for developers using this project.
 ├── data
 │   ├── external       <- Data from third party sources.
-│   ├── interim        <- Intermediate data that has been transformed.
-│   ├── processed      <- The final, canonical data sets for modeling.
+│   ├── features       <- Fully processed and engineered features data.
+│   ├── processed      <- The processed raw data to be engineered into features.
 │   └── raw            <- The original, immutable data dump.
 │
 ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
@@ -73,14 +73,14 @@ The directory structure of your new project looks like this:
 │   │
 │   ├── __init__.py    <- Makes src a Python module
 │   │
-│   ├── data           <- Functions/Classes related to acquiring the data
+│   ├── data           <- Functions/Classes related to acquiring and processing the data
 │   │   └── __init__.py
 │   │   └── file_functions.py
 │   │   └── get_data_functions.py
 │   │   └── parse.py
 │   │   └── process.py
 │   │
-│   ├── features       <- Scripts to turn raw data into features for modeling
+│   ├── features       <- Scripts to turn processed data into features for modeling
 │   │   └── __init__.py
 │   │
 │   ├── models         <- Scripts to train models and then use trained models to make
