@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Make Data Set Script
+get_data.py
 
-Script which acquires the data set and pre-processes it for exploration
-and feature engineering.
+    Script which acquires the raw data set and saves it.
 
+@author: Douglas Daly
+@date: 11/18/2017
 """
 #
 #   Imports
@@ -16,31 +17,46 @@ from dotenv import find_dotenv, load_dotenv
 
 
 #
+#   Variable Definitions
+#
+
+DATA_DIR_LOC = 'data/raw/'
+
+PROJECT_DIR = None
+DATA_DIR = None
+
+
+#
 #   Function Definitions
 #
 
+
+#
+#   Main Script
+#
+
+
 @click.command()
 def main():
-    """ Runs data processing scripts to turn raw data from (../raw) into
-        cleaned data ready to be analyzed (saved in ../processed).
+    """ Downloads and saves raw data for this project into the DATA_DIR
     """
     logger = logging.getLogger(__name__)
     logger.info("Starting data acquisition...")
 
-    # CODE TO ACQUIRE DATA
+    # [Start] CODE TO ACQUIRE AND SAVE DATA
 
+    # [ End ] CODE TO ACQUIRE AND SAVE DATA
 
+    logger.info("Finished data acquisition.")
 
-#
-#   Script Entry-Point
-#
 
 if __name__ == '__main__':
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(level=logging.INFO, format=log_fmt)
 
     # not used in this stub but often useful for finding various files
-    project_dir = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)
+    PROJECT_DIR = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)
+    DATA_DIR = os.path.join(PROJECT_DIR, DATA_DIR_LOC)
 
     # find .env automatically by walking up directories until it's found, then
     # load up the .env entries as environment variables

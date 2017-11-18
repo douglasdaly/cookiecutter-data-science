@@ -10,6 +10,11 @@ PROFILE = {{ cookiecutter.aws_profile }}
 PROJECT_NAME = {{ cookiecutter.repo_name }}
 PYTHON_INTERPRETER = {{ cookiecutter.python_interpreter }}
 
+SUBDIR_ROOTS := src notebooks
+DIRS := . $(shell find $(SUBDIR_ROOTS) -type d)
+GARBAGE_PATTERNS := *.pyc *~ *-checkpoint.ipynb
+GARBAGE := $(foreach DIR,$(DIRS),$(addprefix $(DIR)/,$(GARBAGE_PATTERNS)))
+
 ifeq (,$(shell which conda))
 HAS_CONDA=False
 else
@@ -25,13 +30,22 @@ requirements: test_environment
 	pip install -r requirements.txt
 	pip install -e .
 
-## Make Dataset
-data:
-	$(PYTHON_INTERPRETER) scripts/make_dataset.py
+## Gets the data and stores it locally
+data-get:
+	$(PYTHON_INTERPRETER) scripts/get_data.py
 
-## Delete all compiled Python files
+## Processes the raw data and stores the processed result
+data-process:
+	$(PYTHON_INTERPRETER) scripts/process_data.py
+
+## Deletes any processed data files/features data files
+data-clean:
+	@rm -rf data/processed/*
+	@rm -rf data/features/*
+
+## Delete all compiled Python files or temp files
 clean:
-	find . -name "*.pyc" -exec rm {} \;
+	@rm -rf $(GARBAGE)
 
 ## Lint using flake8
 lint:
