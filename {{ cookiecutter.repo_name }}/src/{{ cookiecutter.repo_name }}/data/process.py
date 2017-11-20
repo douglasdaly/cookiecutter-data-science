@@ -115,7 +115,7 @@ def get_text_column_names(data, ignore_columns=None):
     -------
     list
         List of the column names which contain string data
-    
+
     """
     if ignore_columns is not None:
         cols_2_check = data.columns - ignore_columns
@@ -124,6 +124,6 @@ def get_text_column_names(data, ignore_columns=None):
 
     temp = data[cols_2_check]
     test = temp.applymap(type).eq(str).any()
-    test = test[test == True]
+    test = test[test is True]
 
     return list(test.index.values)

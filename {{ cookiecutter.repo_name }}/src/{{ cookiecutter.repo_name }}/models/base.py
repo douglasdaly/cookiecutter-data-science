@@ -11,8 +11,9 @@ InvalidHyperParameterException exceptions.
 #   Imports
 #
 import os
-import pickle
 from abc import ABCMeta, abstractmethod
+
+from ..data import save_data_to_pickle, load_data_from_pickle
 
 
 #
@@ -524,14 +525,14 @@ class Model(object, metaclass=ABCMeta):
         parameters_file = os.path.join(model_dir, "parameters.pkl")
         if os.path.exists(parameters_file) and not overwrite_existing:
             return False
-        with open(parameters_file, 'wb') as fout:
-            pickle.dump(self._parameters, fout)
+        save_data_to_pickle(self._parameters, parameters_file,
+                            overwrite=overwrite_existing)
 
         hyper_parameters_file = os.path.join(model_dir, "hyper_parameters.pkl")
         if os.path.exists(hyper_parameters_file) and not overwrite_existing:
             return False
-        with open(hyper_parameters_file, 'wb') as fout:
-            pickle.dump(self._hyper_parameters, fout)
+        save_data_to_pickle(self._hyper_parameters, hyper_parameters_file,
+                            overwrite=overwrite_existing)
 
         return self._save_model_helper(model_dir)
 
@@ -577,12 +578,10 @@ class Model(object, metaclass=ABCMeta):
             return False
 
         parameters_file = os.path.join(model_dir, "parameters.pkl")
-        with open(parameters_file, 'rb') as fin:
-            self._parameters = pickle.load(fin)
+        self._parameters = load_data_from_pickle(parameters_file)
 
         hyper_parameters_file = os.path.join(model_dir, "hyper_parameters.pkl")
-        with open(hyper_parameters_file, 'rb') as fin:
-            self._hyper_parameters = pickle.load(fin)
+        self._hyper_parameters = load_data_from_pickle(hyper_parameters_file)
 
         return self._load_model_helper(model_dir)
 
@@ -628,33 +627,14 @@ class Model(object, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def run(self):
-        """ Runs the training routine
+    def fit(self, **kwargs):
+        """ Fits the model
 
-        Runs a pre-set training routine particular to this model based
-        on the set `hyper_parameters`.
-
-        Returns
-        -------
-        bool
-            Result of training run (success or failure)
-
-        """
-        pass
-
-    @abstractmethod
-    def train(self, x, y, **kwargs):
-        """ Trains the model
-
-        Given the features `x` and labels/target outputs `y` trains the
-        model on the given data only.
+        Fits the constructed model using the parameters and hyper-parameters
+        specified.
 
         Parameters
         ----------
-        x: numpy.ndarray
-            Training data features
-        y: numpy.ndarray
-            Training data values/labels
         kwargs: dict
             Additional options for training
 
