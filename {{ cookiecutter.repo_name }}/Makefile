@@ -1,24 +1,25 @@
-.PHONY: clean data lint requirements sync_data_to_s3 sync_data_from_s3
+.PHONY: clean data lint requirements freeze create_environment
 
 #################################################################################
 # GLOBALS                                                                       #
 #################################################################################
 
 PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-BUCKET = {{ cookiecutter.s3_bucket }}
-PROFILE = {{ cookiecutter.aws_profile }}
 PROJECT_NAME = {{ cookiecutter.repo_name }}
 PYTHON_INTERPRETER = {{ cookiecutter.python_interpreter }}
+DEPENDENCY_MANAGER = {{ cookiecutter.dependency_manager }}
 
 SUBDIR_ROOTS := src notebooks
 DIRS := . $(shell find $(SUBDIR_ROOTS) -type d)
 GARBAGE_PATTERNS := *.pyc *~ *-checkpoint.ipynb
 GARBAGE := $(foreach DIR,$(DIRS),$(addprefix $(DIR)/,$(GARBAGE_PATTERNS)))
 
-ifeq (,$(shell which conda))
-HAS_CONDA=False
+ifeq ($(DEPENDENCY_MANAGER), pipenv)
+    RUN_PRE = pipenv run
+    INSTALL_DEPENDENCIES = pipenv install
+    PYTHON_INTERPRETER := $(RUN_PRE) $(PYTHON_INTERPRETER)
 else
-HAS_CONDA=True
+    INSTALL_DEPENDENCIES = pip install -r requirements.txt
 endif
 
 #################################################################################
@@ -27,8 +28,7 @@ endif
 
 ## Install Python Dependencies
 requirements: test_environment
-	pip install -r requirements.txt
-	pip install -e .
+	$(INSTALL_DEPENDENCIES)
 
 ## Gets the data and stores it locally
 data-get:
@@ -51,38 +51,26 @@ clean:
 lint:
 	flake8 --exclude=env/,lib/,bin/,docs/conf.py .
 
-## Upload Data to S3
-sync_data_to_s3:
-ifeq (default,$(PROFILE))
-	aws s3 sync data/ s3://$(BUCKET)/data/
-else
-	aws s3 sync data/ s3://$(BUCKET)/data/ --profile $(PROFILE)
-endif
-
-## Download Data from S3
-sync_data_from_s3:
-ifeq (default,$(PROFILE))
-	aws s3 sync s3://$(BUCKET)/data/ data/
-else
-	aws s3 sync s3://$(BUCKET)/data/ data/ --profile $(PROFILE)
-endif
-
 ## Set up python interpreter environment
 create_environment:
-ifeq (True,$(HAS_CONDA))
-		@echo ">>> Detected conda, creating conda environment."
-ifeq (3,$(findstring 3,$(PYTHON_INTERPRETER)))
-	conda create --name $(PROJECT_NAME) python=3
+ifeq($(DEPENDENCY_MANAGER), pipenv)
+    @echo ">>> Installing pipenv if not already installed"
+	@pip install -q pipenv
+	@echo ">>> Creating new virtualenv with pipenv"
+	@pipenv install
 else
-	conda create --name $(PROJECT_NAME) python=2.7
+    @echo ">>> Installing virtualenv if not already installed"
+    @pip install -q virtualenv
+    @echo ">>> Creating new virtual environment for project"
+    @virtualenv env/
 endif
-		@echo ">>> New conda env created. Activate with:\nsource activate $(PROJECT_NAME)"
+
+## Freeze dependencies
+freeze:
+ifeq($(DEPENDENCY_MANAGER), pipenv)
+    $(RUN_PRE) pip freeze --local > requirements.txt
 else
-	@pip install -q virtualenv virtualenvwrapper
-	@echo ">>> Installing virtualenvwrapper if not already intalled.\nMake sure the following lines are in shell startup file\n\
-	export WORKON_HOME=$$HOME/.virtualenvs\nexport PROJECT_HOME=$$HOME/Devel\nsource /usr/local/bin/virtualenvwrapper.sh\n"
-	@bash -c "source `which virtualenvwrapper.sh`;mkvirtualenv $(PROJECT_NAME) --python=$(PYTHON_INTERPRETER)"
-	@echo ">>> New virtualenv created. Activate with:\nworkon $(PROJECT_NAME)"
+    pip freeze --local > requirements.txt
 endif
 
 ## Test python environment is setup correctly
