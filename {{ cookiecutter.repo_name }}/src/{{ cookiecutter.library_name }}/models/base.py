@@ -51,13 +51,12 @@ class Model(object, metaclass=ABCMeta):
 
     @property
     def parameters(self):
-        """ Parameters which are currently set for this model
-        """
+        """dict: Parameters which are currently set for this model"""
         return self._parameters
 
     @parameters.setter
     def parameters(self, params):
-        """ Sets the parameters
+        """Sets the parameters
 
         Sets the parameters to the given `params` dictionary if they
         are all valid parameters.
@@ -83,7 +82,7 @@ class Model(object, metaclass=ABCMeta):
             self.add_parameter(k, v)
 
     def add_parameter(self, param, value):
-        """ Adds a parameter
+        """Adds a parameter
 
         Will add the given `param` and `value` to the parameters if
         they are valid, throws an exception if they are not.
@@ -109,7 +108,7 @@ class Model(object, metaclass=ABCMeta):
             self._parameters[param] = value
 
     def remove_parameter(self, param):
-        """ Removes a parameter
+        """Removes a parameter
 
         Removes the specified `param` from the parameters set if it is
         part of the parameter set and returns its currently set value,
@@ -138,7 +137,7 @@ class Model(object, metaclass=ABCMeta):
         return ret
 
     def _check_parameter(self, param, value, suppress_exceptions=False):
-        """ Checks the given parameter and value combination
+        """Checks the given parameter and value combination
 
         Checks the `param` and `value` given to see if  they are valid
         against the set of parameter options specified in the class's
@@ -179,13 +178,12 @@ class Model(object, metaclass=ABCMeta):
 
     @property
     def hyper_parameters(self):
-        """ Hyper-parameters which are currently set for this model
-        """
+        """dict: Hyper-parameters which are currently set for this model"""
         return self._hyper_parameters
 
     @hyper_parameters.setter
     def hyper_parameters(self, hyper_params):
-        """ Sets the hyper-parameters
+        """Sets the hyper-parameters
 
         Sets the hyper-parameters to the given `hyper_params`
         dictionary if they are all valid hyper-parameters.
@@ -211,7 +209,7 @@ class Model(object, metaclass=ABCMeta):
             self.add_hyper_parameter(k, v)
 
     def add_hyper_parameter(self, hyper_param, value):
-        """ Adds a hyper-parameter
+        """Adds a hyper-parameter
 
         Adds a single hyper-parameter to the set of hyper-parameters if
         the given `hyper_param` and `value` are valid.
@@ -237,7 +235,7 @@ class Model(object, metaclass=ABCMeta):
             self._hyper_parameters[hyper_param] = value
 
     def remove_hyper_parameter(self, hyper_param):
-        """ Removes a hyper-parameter
+        """Removes a hyper-parameter
 
         Removes the specified `hyper_param` from the set of
         hyper-parameters if it's set and returns the current value, if
@@ -268,7 +266,7 @@ class Model(object, metaclass=ABCMeta):
 
     def _check_hyper_parameter(self, hyper_param, value,
                                suppress_exceptions=False):
-        """ Checks a hyper-parameter
+        """Checks a hyper-parameter
 
         Checks the given `hyper_param` and `value` for validity against
         the opts_hyper_parameters
@@ -309,7 +307,7 @@ class Model(object, metaclass=ABCMeta):
 
     @staticmethod
     def __param_check_helper(param, value, option_dict, exception_type=None):
-        """ Helper function for checking given Parameter and Value
+        """Helper function for checking given Parameter and Value
 
         Given a `option_dict` - a dictionary of parameters to
         _ParamOption values, checks the validity of the given `param`
@@ -378,10 +376,10 @@ class Model(object, metaclass=ABCMeta):
         return True, None
 
     def _check_init_parameters(self, use_defaults=True):
-        """ Checks/initializes parameters
+        """Checks/initializes parameters
 
         Checks whether or not all the required `parameters` are set,
-        oiptionally setting them to their default values if they're
+        optionally setting them to their default values if they're
         missing and the `use_defaults` flag is set.
 
         Parameters
@@ -406,7 +404,7 @@ class Model(object, metaclass=ABCMeta):
             return False
 
     def _check_init_hyper_parameters(self, use_defaults=True):
-        """ Checks/initializes hyper-parameters
+        """Checks/initializes hyper-parameters
 
         Checks whether or not all the required `hyper_parameters` are
         set, optionally setting them to their default values if
@@ -436,7 +434,7 @@ class Model(object, metaclass=ABCMeta):
 
     @staticmethod
     def __check_init_params_helper(params, opt_params, use_defaults=True):
-        """ Helper for checking/initializing parameters
+        """Helper for checking/initializing parameters
 
         Helper function which takes the given `params` and `opt_params`
         dictionaries and checks the `params`, optionally setting any
@@ -471,14 +469,13 @@ class Model(object, metaclass=ABCMeta):
 
     @property
     def results(self):
-        """ Training result metrics
-        """
+        """dict: Fitting result metrics"""
         return self._results
 
     # Save/Load Methods
 
     def __get_model_directory(self, tag):
-        """ Gets the storage Directory
+        """Gets the storage Directory
 
         Returns the directory where this models `parameters`,
         `hyper_parameters` as well as any other data required for the model
@@ -498,7 +495,7 @@ class Model(object, metaclass=ABCMeta):
         raise NotImplementedError()
 
     def save(self, tag, overwrite_existing=False):
-        """ Saves this model
+        """Saves this model
 
         Saves this model's `parameters`, `hyper_parameters` as well as
         any other data required to reconstruct this model.  Saves this
@@ -537,7 +534,7 @@ class Model(object, metaclass=ABCMeta):
         return self._save_model_helper(model_dir)
 
     def _save_model_helper(self, directory):
-        """ Saves model objects
+        """Saves model objects
 
         Helper function to save model-specific data/objects other than
         `parameters` or `hyper_parameters` that are needed  to
@@ -557,7 +554,7 @@ class Model(object, metaclass=ABCMeta):
         return True
 
     def load(self, tag):
-        """ Loads a model
+        """Loads a model
 
         Loads saved model `parameters` and `hyper_parameters` as well
         as any serialized model-specific objects from a saved version.
@@ -586,7 +583,7 @@ class Model(object, metaclass=ABCMeta):
         return self._load_model_helper(model_dir)
 
     def _load_model_helper(self, directory):
-        """ Loads model objects
+        """Loads model objects
 
         Helper function to load model-specific data/objects other than
         `parameters` or `hyper_parameters` that are needed to
@@ -609,7 +606,7 @@ class Model(object, metaclass=ABCMeta):
 
     @abstractmethod
     def construct(self, **kwargs):
-        """ Constructs the model
+        """Constructs the model
 
         Constructs the model based on the set `parameters`.
 
@@ -628,7 +625,7 @@ class Model(object, metaclass=ABCMeta):
 
     @abstractmethod
     def fit(self, **kwargs):
-        """ Fits the model
+        """Fits the model
 
         Fits the constructed model using the parameters and hyper-parameters
         specified.
@@ -648,7 +645,7 @@ class Model(object, metaclass=ABCMeta):
 
     @abstractmethod
     def predict(self, x, **kwargs):
-        """ Predict outputs
+        """Predict outputs
 
         For the given features, run the trained model to generate
         outputs.

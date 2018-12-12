@@ -1,11 +1,10 @@
+#!/usr/bin/env {{ cookiecutter.python_interpreter }}
 # -*- coding: utf-8 -*-
 """
 process_data.py
 
     Script to process the raw data and store a more usable version
 
-@author: Douglas Daly
-@date: 11/18/2017
 """
 #
 #   Imports
@@ -32,31 +31,17 @@ __PROCESSED_DATA_DIR_NAME = 'processed/'
 
 
 #
-#   Function Definitions
+#   Main Script Functions
 #
 
-
-#
-#   Main Script
-#
-
-@click.command()
-def main():
-    """ Main Script Function
-    """
+@click.group()
+@click.pass_context
+def cli(ctx):
+    """Tools for processing data"""
     # - Logger
     logger = logging.getLogger(__name__)
 
     # [Start] DATA PROCESSING CODE
-
-    # - Get the Data
-    logger.info("Loading in raw data...")
-
-    # - Process the Data
-    logger.info("Processing raw data...")
-
-    # - Save the Processed Data
-    logger.info("Saving processed data...")
 
     # [ End ] DATA PROCESSING CODE
 
@@ -75,4 +60,4 @@ if __name__ == "__main__":
     PROCESSED_DIR = os.path.join(DATA_DIR, __PROCESSED_DATA_DIR_NAME)
 
     # - Run Main Function
-    main()
+    cli(obj={})

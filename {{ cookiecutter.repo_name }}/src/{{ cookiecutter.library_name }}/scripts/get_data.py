@@ -1,11 +1,10 @@
+#!/usr/bin/env {{ cookiecutter.python_interpreter }}
 # -*- coding: utf-8 -*-
 """
-get_data.py
+scripts/get_data.py
 
     Script which acquires the raw data set and saves it.
 
-@author: Douglas Daly
-@date: 11/18/2017
 """
 #
 #   Imports
@@ -27,19 +26,13 @@ DATA_DIR = None
 
 
 #
-#   Function Definitions
+#   Script Functions
 #
 
-
-#
-#   Main Script
-#
-
-
-@click.command()
-def main():
-    """ Downloads and saves raw data for this project into the DATA_DIR
-    """
+@click.group()
+@click.pass_context
+def cli(ctx):
+    """Downloads and saves raw data for this project"""
     logger = logging.getLogger(__name__)
     logger.info("Starting data acquisition...")
 
@@ -49,6 +42,10 @@ def main():
 
     logger.info("Finished data acquisition.")
 
+
+#
+#   Script Entry-point
+#
 
 if __name__ == '__main__':
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -62,4 +59,4 @@ if __name__ == '__main__':
     # load up the .env entries as environment variables
     load_dotenv(find_dotenv())
 
-    main()
+    cli(obj={})

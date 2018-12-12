@@ -19,7 +19,7 @@ ifeq ($(DEPENDENCY_MANAGER), pipenv)
     INSTALL_DEPENDENCIES = pipenv install
     PYTHON_INTERPRETER := $(RUN_PRE) $(PYTHON_INTERPRETER)
 else
-    INSTALL_DEPENDENCIES = pip install -r requirements.txt
+    INSTALL_DEPENDENCIES = $(DEPENDENCY_MANAGER) install -r requirements.txt
 endif
 
 #################################################################################
@@ -70,7 +70,7 @@ freeze:
 ifeq($(DEPENDENCY_MANAGER), pipenv)
     $(RUN_PRE) pip freeze --local > requirements.txt
 else
-    pip freeze --local > requirements.txt
+    $(DEPENDENCY_MANAGER) freeze --local > requirements.txt
 endif
 
 ## Test python environment is setup correctly

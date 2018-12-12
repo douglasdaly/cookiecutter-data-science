@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-process.py
+data/pandas_helpers.py
 
-    Modules for processing the raw data
+    Functions for working with pandas DataFrames and Series
 
 @author: Douglas Daly
 @date: 11/18/2017
@@ -11,17 +11,50 @@ process.py
 #   Imports
 #
 import pandas as pd
-import numpy as np
+
+from .file_functions import check_file_exists
 
 
 #
 #   Function Definitions
 #
 
-def split_x_y_dataframe(data, y_columns, x_columns=None):
-    """ Splits DataFrame into X and Y DataFrames
+def df_parse_csv(filename, index=None):
+    """Parses a CSV file into a DataFrame
 
-    Given a DataFrame and Y column(s), split the DataFrame into two seperate
+    Parses the contents of the given CSV file into a pandas DataFrame.
+
+    Parameters
+    ----------
+    filename: str
+        CSV file to load data from.
+
+    index: str, optional
+        Column name to set as the DataFrame's index.
+
+    Raises
+    ------
+    FileDoesNotExistError
+        If the specified `filename` does not exist.
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame of the file data requested.
+
+    """
+    check_file_exists(filename)
+
+    df_data = pd.read_csv(filename)
+    if index is not None:
+        df_data.set_index(index, inplace=True)
+    return df_data
+
+
+def df_split_columns(data, y_columns, x_columns=None):
+    """Splits given DataFrame into X and Y DataFrames along columns
+
+    Given a DataFrame and Y column(s), split the DataFrame into two separate
     DataFrames, one with the X data and one with the Y data based on the
     parameters given.  If the given data doesn't contain the `y_columns` then
     `None` is returned (e.g. the testing data).
@@ -44,19 +77,18 @@ def split_x_y_dataframe(data, y_columns, x_columns=None):
         The Y data split out from the given `data`
 
     """
-    if type(y_columns) == str:
+    if isinstance(y_columns, str):
         y_columns = [y_columns]
 
     if set(y_columns).issubset(data.columns):
-        y_data = data[y_columns]
+        y_data = data.loc[:, y_columns]
     else:
         y_data = None
 
     if x_columns is not None:
-        if type(x_columns) == str:
+        if isinstance(x_columns, str):
             x_columns = [x_columns]
-
-        x_data = data[x_columns]
+        x_data = data.loc[:, x_columns]
     else:
         if y_data is not None:
             x_data = data.drop(y_columns, axis=1)
@@ -66,8 +98,8 @@ def split_x_y_dataframe(data, y_columns, x_columns=None):
     return x_data, y_data
 
 
-def one_hot_text_dataframe_columns(data, columns):
-    """ One-Hot's Text Columns
+def df_one_hot_text_columns(data, columns):
+    """One-Hot's text columns specified
 
     Given a DataFrame (`data`) replace the given `columns` with new ones
     representing a one-hot on each of the given `columns` using the original
@@ -90,14 +122,14 @@ def one_hot_text_dataframe_columns(data, columns):
     get_text_column_names
 
     """
-    if type(columns) == str:
+    if isinstance(columns, str):
         columns = [columns]
 
     return pd.get_dummies(data, columns=columns, prefix=columns)
 
 
-def get_text_column_names(data, ignore_columns=None):
-    """ Gets names of Columns in DataFrame containing text data
+def df_get_text_column_names(data, ignore_columns=None):
+    """Gets names of Columns in DataFrame containing text data
 
     Returns a list of all the columns in the given `data` which have any string
     data in them (not necessarily all string data - if the column contains a
@@ -108,7 +140,7 @@ def get_text_column_names(data, ignore_columns=None):
     data: pandas.DataFrame
         Data to check each column for string data in
 
-    ignore_columns: list
+    ignore_columns: list, optional
         List of columns to ignore in the checking process
 
     Returns
@@ -122,7 +154,7 @@ def get_text_column_names(data, ignore_columns=None):
     else:
         cols_2_check = data.columns
 
-    temp = data[cols_2_check]
+    temp = data.loc[:, cols_2_check]
     test = temp.applymap(type).eq(str).any()
     test = test[test is True]
 
