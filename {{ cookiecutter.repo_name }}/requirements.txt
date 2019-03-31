@@ -1,10 +1,9 @@
 click
-Sphinx
+sphinx
 coverage
 awscli
 flake8
 python-dotenv
 numpy
 pandas
-matplotlib
 "beautifulsoup4"

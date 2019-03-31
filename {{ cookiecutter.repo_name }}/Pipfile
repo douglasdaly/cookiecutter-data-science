@@ -4,32 +4,17 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+click = "*"
+ipykernel = "*"
+requests = "*"
+"beautifulsoup4" = "*"
+tqdm = "*"
 numpy = "*"
 pandas = "*"
-ipykernel = "*"
-jupyter = "*"
-"beautifulsoup4" = "*"
-click = "*"
 matplotlib = "*"
-papermill = "*"
 scikit-learn = "*"
-seaborn = "*"
 scipy = "*"
-pillow = "*"
-geos = "*"
-cython = "*"
-pyproj = "*"
-cartopy = "*"
-tqdm = "*"
-moviepy = "*"
-optimage = "*"
-jupyterlab = "*"
+seaborn = "*"
 
 [requires]
 python_version = "{{ cookiecutter.python_version }}"
-
-[scripts]
-install_ipykernel = "python -m ipykernel install --user --name {{ cookiecutter.repo_name }} --display-name \"{{ cookiecutter.project_name }}\""
-remove_ipykernel = "jupyter kernelspec remove {{ cookiecutter.repo_name }}"
-spyder = "spyder3 --new-instance"
-nteract = "nteract --kernel {{ cookiecutter.repo_name }} --cwd ."

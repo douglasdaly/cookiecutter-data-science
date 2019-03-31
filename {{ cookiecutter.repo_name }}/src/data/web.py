@@ -11,21 +11,21 @@ web.py
 #   Imports
 #
 import time
-import requests
 import urllib.request
 
+import requests
 from tqdm.auto import tqdm
 from bs4 import BeautifulSoup
 
-from .base import NoDataError
+from .exceptions import NoDataError
 
 
 #
 #   Function Definitions
 #
 
-def download_file(url, filename, show_status=True, desc=''):
-    """ Downloads a file from the internet
+def download_file(url, path=None, show_status=False, desc=''):
+    """Downloads a file from the internet.
 
     Downloads the target file from the given url and saves it locally to the
     given filename.  Optionally shows the download status as it progresses.
@@ -34,9 +34,8 @@ def download_file(url, filename, show_status=True, desc=''):
     ----------
     url: str
         URL to download the file from.
-    filename: str
+    path: str, optional
         File path to save the downloaded file to.
-
     show_status: bool, optional
         Whether or not to show a progress bar as the file is downloaded.
     desc: str, optional
@@ -44,14 +43,16 @@ def download_file(url, filename, show_status=True, desc=''):
 
     Returns
     -------
-    bool
-        The result status of the download and save.
+    str
+        The downloaded file.
 
     """
-    r = requests.get(url, stream=True)
+    if path is None:
+        path = url.split('/')[-1]
 
+    r = requests.get(url, stream=True)
     total_size = int(r.headers.get('content-length', 0))
-    with open(filename, 'wb') as fout:
+    with open(path, 'wb') as fout:
         if show_status:
             for f_chunk in tqdm(r.iter_content(32*1024), total=total_size,
                                 unit='B', unit_scale=True, desc=desc):
@@ -60,31 +61,30 @@ def download_file(url, filename, show_status=True, desc=''):
             for f_chunk in r.iter_content(32*1024):
                 fout.write(f_chunk)
 
-    return True
+    return path
 
 
 def get_data(url, retries=3, retry_wait=5):
-    """Downloads data from the given URL
+    """Downloads data from the given URL.
 
     Parameters
     ----------
     url: str
-        URL to acquire the data from
-
+        URL to acquire the data from.
     retries: int, optional
-        Number of times to retry the request if it fails
+        Number of times to retry the request if it fails.
     retry_wait: int, optional
-        Number of seconds to wait between retries
+        Number of seconds to wait between retries.
+
+    Returns
+    -------
+    object
+        The data requested from the given URL.
 
     Raises
     ------
     MaxRetryError
         If the maximum number of retries is exceeded.
-
-    Returns
-    -------
-    object
-        The data requested from the given URL
 
     """
     if retries <= 0:
@@ -101,17 +101,21 @@ def get_data(url, retries=3, retry_wait=5):
 
 
 def get_soup(url, parser='html.parser', **kwargs):
-    """Gets a BeautifulSoup object of the web page specified
+    """Gets a BeautifulSoup object of the web page specified.
 
     Parameters
     ----------
     url: str
         URL to get web page data for.
-
     parser: str, optional
         HTML Parser to use.
     kwargs: optional
         Additional kwargs to pass to the get_data function.
+
+    Returns
+    -------
+    BeautifulSoup
+        Beautiful soup object of the page at the URL given.
 
     Raises
     ------
@@ -119,11 +123,6 @@ def get_soup(url, parser='html.parser', **kwargs):
         If no data is acquired from the specified URL.
     MaxRetryError
         If the maximum number of retries is exceeded.
-
-    Returns
-    -------
-    BeautifulSoup
-        Beautiful soup object of the page at the URL given.
 
     See Also
     --------
@@ -140,11 +139,11 @@ def get_soup(url, parser='html.parser', **kwargs):
 
 
 #
-#   Exception Classes
+#   Exceptions
 #
 
 class MaxRetryError(Exception):
     """
-    Exception Class for Max retries
+    Exception class thrown when the maximum number of retries has been reached.
     """
     pass

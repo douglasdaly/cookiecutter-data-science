@@ -1,115 +1,96 @@
 # Doug's Cookiecutter Data Science Project Template
 
-_A logical, reasonably standardized, but flexible project structure for doing and sharing data science work._
+*A logical, reasonably standardized, but flexible project structure for doing 
+and sharing data science work.*
 
 
-#### [Original project homepage](http://drivendata.github.io/cookiecutter-data-science/)
+**[Original project homepage](http://drivendata.github.io/cookiecutter-data-science/)**
 
 
-### Requirements to use the cookiecutter template:
------------
- - Python 2.7 or 3.5
- - [Cookiecutter Python package](http://cookiecutter.readthedocs.org/en/latest/installation.html) >= 1.4.0: This can be installed with pip by or conda depending on how you manage your Python packages:
+### Requirements
 
-``` bash
+[Cookiecutter Python package](http://cookiecutter.readthedocs.org/en/latest/installation.html) >= 1.4.0: 
+This can be installed with pip by or conda depending on how you manage your 
+Python packages:
+
+```bash
 $ pip install cookiecutter
 ```
-
 or
 
-``` bash
+```bash
 $ conda config --add channels conda-forge
 $ conda install cookiecutter
 ```
 
+To start a new project simply run:
 
-### To start a new project, run:
-------------
-
-    cookiecutter https://github.com/douglasdaly/cookiecutter-data-science
-
+```bash
+$ cookiecutter gh:douglasdaly/cookiecutter-data-science
+```
 
 
-### The resulting directory structure
-------------
+
+### Project Layout
 
 The directory structure of your new project looks like this: 
 
 ```
-├── LICENSE
-├── Makefile           <- Makefile with commands like `make data` or `make train`
-├── README.md          <- The top-level README for developers using this project.
 ├── data
-│   ├── external       <- Data from third party sources.
-│   ├── features       <- Fully processed and engineered features data.
-│   ├── processed      <- The processed raw data to be engineered into features.
+│   ├── cooked         <- Derived/fully-cooked data.
+│   ├── external       <- Additional data from external sources.
+│   ├── interim        <- Temporary store for any interim data.
+│   ├── processed      <- The (lightly) processed raw data.
 │   └── raw            <- The original, immutable data dump.
 │
-├── docs               <- A default Sphinx project; see sphinx-doc.org for details
+├── docs               <- A default Sphinx project
+│
+├── media              <- Any media files used by or generated from the project.
 │
 ├── models             <- Trained and serialized models, model predictions, or model summaries
 │
-├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-│                         the creator's initials, and a short `-` delimited description, e.g.
-│                         `1.0-jqp-initial-data-exploration`.
+├── notebooks          <- Jupyter notebooks. Naming convention is a number (for 
+│                         ordering), the creator's initials, and a short `-` 
+│                         delimited description, e.g. `1-dd-initial-data-exploration.ipynb`.
 │
-├── references         <- Data dictionaries, manuals, and all other explanatory materials.
+├── references         <- Helpful reference information for the project/data.
 │
 ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-│   └── figures        <- Generated graphics and figures to be used in reporting
 │
-├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-│                         generated with `pip freeze > requirements.txt`
+├── requirements.txt   <- The requirements file for reproducing the analysis 
+│                         environment, e.g. generated with `pip freeze > 
+│                         requirements.txt`.
 │
-├── scripts            <- Folder for scripts used in this project for various tasks
-│   └── build_features.py
-│   └── get_data.py
-│   └── predict_model.py
-│   └── process_data.py
-│   └── train_model.py
+├── scripts            <- Folder for scripts used in this project.
+│   ├── data.py        <- Script tools for working with the data.
+│   └── media.py       <- Script tools for generating media files.
 │
-├── src                <- Source code for library used in this project and installed as a
-│   │                     development library for use within this projects virtualenv.
+├── src                <- Source code used in this project.
 │   │
-│   ├── __init__.py    <- Makes src a Python module
-│   │
-│   ├── data           <- Functions/Classes related to acquiring and processing the data
-│   │   └── __init__.py
-│   │   └── file_functions.py
-│   │   └── get_data_functions.py
-│   │   └── parse.py
+│   ├── data           <- Code related to acquiring and processing the data
+│   │   ├── file_functions.py
+│   │   ├── get_data_functions.py
+│   │   ├── parse.py
 │   │   └── process.py
 │   │
-│   ├── features       <- Scripts to turn processed data into features for modeling
-│   │   └── __init__.py
+│   ├── models         <- Code for models.
 │   │
-│   ├── models         <- Scripts to train models and then use trained models to make
-│   │   │                 predictions
-│   │   └── __init__.py
-│   │   └── base.py
-│   │
-│   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-│       └── __init__.py
+│   └── visualization  <- Code for visualizations
 │
-├── setup.py           <- Setup python config for installing library from src folder
-│
+├── LICENSE            <- License file for the new project.
+├── Makefile           <- Makefile with helpful commands
+├── README.md          <- The top-level README for using this project.
 └── tox.ini            <- tox file with settings for running tox; see tox.testrun.org
 ```
 
-### Setting up the project virtualenv
-------------
 
-    make create_environment
+### Running the Tests
 
+```bash
+py.test tests
+```
 
-### Installing dependencies
-------------
+### License
 
-    make requirements
-
-
-### Running the tests
-------------
-
-    py.test tests
-
+This project is licensed under the MIT license.  See the ```LICENSE``` file
+for more details.

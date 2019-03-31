@@ -1,11 +1,11 @@
 {
-    "project_name": "project_name",
-    "repo_name": "{{ cookiecutter.project_name.lower().replace(' ', '-') }}",
-    "library_name": "{{ cookiecutter.project_name.lower().replace(' ', '_') }}",
-    "author_name": "Your name (or your organization/company/team)",
+    "project_name": "Name of the project",
     "description": "A short description of the project.",
-    "open_source_license": ["MIT", "BSD", "Not open source"],
-    "python_version": [2.7, 3.5, 3.6, 3.7],
+    "author_name": "Your name (or your organization/company/team)",
+    "repo_name": "{{ cookiecutter.project_name.lower().replace(' ', '-') + '.git' }}",
+    "open_source_license": ["MIT", "BSD", "None"],
+    "python_version": [3.7, 3.6, 3.5, 2.7],
     "python_interpreter": ["python", "python3"],
-    "dependency_manager": ["pipenv", "pip", "pip3"]
+    "dependency_manager": ["pipenv", "pip"],
+    "unit_tests": ["pytest"]
 }
