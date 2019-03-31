@@ -68,12 +68,9 @@ The directory structure of your new project looks like this:
 ├── src                <- Source code used in this project.
 │   │
 │   ├── data           <- Code related to acquiring and processing the data
-│   │   ├── file_functions.py
-│   │   ├── get_data_functions.py
-│   │   ├── parse.py
-│   │   └── process.py
+│   │   └── web.py     <- Helpers for getting data from the internet.
 │   │
-│   ├── models         <- Code for models.
+│   ├── models         <- Code for models goes here.
 │   │
 │   └── visualization  <- Code for visualizations
 │

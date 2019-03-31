@@ -1,15 +1,4 @@
 # -*- coding: utf-8 -*-
 """
-Parameterized models package.
+Models sub-module.
 """
-from .base import Model
-from .parameters import Parameter
-from .parameters import BoundedParameter
-
-__all__ = [
-    # Base
-    'Model',
-    # Parameters
-    'Parameter',
-    'BoundedParameter',
-]

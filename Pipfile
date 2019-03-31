@@ -8,6 +8,8 @@ verify_ssl = true
 [packages]
 cookiecutter = "*"
 pytest = "*"
+sphinx = "*"
+sphinx-rtd-theme = "*"
 
 [requires]
 python_version = "3.7"
