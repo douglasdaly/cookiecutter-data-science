@@ -16,3 +16,6 @@ env/*
 
 # PyCharm project
 .idea
+
+# VSCode
+.vscode
