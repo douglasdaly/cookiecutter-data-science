@@ -1,142 +1,141 @@
-.PHONY: clean data lint requirements sync_data_to_s3 sync_data_from_s3
-
-#################################################################################
-# GLOBALS                                                                       #
-#################################################################################
+###############################################################################
+# CONFIGURATION                                                               #
+###############################################################################
 
 PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-BUCKET = {{ cookiecutter.s3_bucket }}
-PROFILE = {{ cookiecutter.aws_profile }}
-PROJECT_NAME = {{ cookiecutter.repo_name }}
-PYTHON_INTERPRETER = {{ cookiecutter.python_interpreter }}
+PROJECT_NAME = {{ cookiecutter.project_name }}
 
-ifeq (,$(shell which conda))
-HAS_CONDA=False
+PYTHON = {{ cookiecutter.python_interpreter }}
+PKG_MGR = {{ cookiecutter.dependency_manager }}
+UNIT_TEST = {{ cookiecutter.unit_tests }}
+
+
+###############################################################################
+# SETUP                                                                       #
+###############################################################################
+
+IPYK_NAME = {{ cookiecutter.repo_name.replace('.git', '') }}
+IPYK_DISPLAY_NAME := $(PROJECT_NAME)
+
+SUBDIR_ROOTS := src notebooks scripts tests
+DIRS := . $(shell find $(SUBDIR_ROOTS) -type d)
+GARBAGE_PATTERNS := *.pyc *~ *-checkpoint.ipynb
+GARBAGE := $(foreach DIR,$(DIRS),$(addprefix $(DIR)/,$(GARBAGE_PATTERNS)))
+
+ifeq ($(PKG_MGR), pipenv)
+    RUN_PRE = pipenv run
+    INSTALL_DEPENDENCIES = pipenv install
+    GENERATE_DEPENDENCIES = pipenv lock -r > requirements.txt
+    CREATE_VENV =
+    REMOVE_VENV = pipenv --rm
 else
-HAS_CONDA=True
+    RUN_PRE =
+    INSTALL_DEPENDENCIES = pip install -r requirements.txt
+    GENERATE_DEPENDENCIES = pip freeze --local > requirements.txt
+    CREATE_VENV = virtualenv env/
+    REMOVE_VENV = rm -rf env/
 endif
 
-#################################################################################
-# COMMANDS                                                                      #
-#################################################################################
+PYTHON := $(RUN_PRE) $(PYTHON)
+UNIT_TEST := $(RUN_PRE) $(UNIT_TEST)
 
-## Install Python Dependencies
-requirements: test_environment
-	pip install -r requirements.txt
+###############################################################################
+# COMMANDS                                                                    #
+###############################################################################
+.PHONY: help \
+        requirements requirements-generate \
+        data-get data-process data-cook \
+        media-generate \
+        environment-create environment-remove environment-test \
+        ipykernel-install ipykernel-uninstall \
+        clean clean-data clean-media \
+		lint
 
-## Make Dataset
-data: requirements
-	$(PYTHON_INTERPRETER) src/data/make_dataset.py
+.DEFAULT-GOAL := help
 
-## Delete all compiled Python files
-clean:
-	find . -name "*.pyc" -exec rm {} \;
+# Misc. helpers
 
-## Lint using flake8
-lint:
-	flake8 --exclude=lib/,bin/,docs/conf.py .
+help: ## Displays this help message
+	@printf 'Usage: make \033[36m[target]\033[0m\n'
+	@echo ''
+	@echo 'Available targets:'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@echo ''
 
-## Upload Data to S3
-sync_data_to_s3:
-ifeq (default,$(PROFILE))
-	aws s3 sync data/ s3://$(BUCKET)/data/
-else
-	aws s3 sync data/ s3://$(BUCKET)/data/ --profile $(PROFILE)
-endif
+# Data
 
-## Download Data from S3
-sync_data_from_s3:
-ifeq (default,$(PROFILE))
-	aws s3 sync s3://$(BUCKET)/data/ data/
-else
-	aws s3 sync s3://$(BUCKET)/data/ data/ --profile $(PROFILE)
-endif
+data-get: ## Gets the data and stores it locally
+	@echo ">>> Getting the data"
+	# [NOTE] You can tailor the call below as needed
+	$(RUN_PRE) ./scripts/data.py get
 
-## Set up python interpreter environment
-create_environment:
-ifeq (True,$(HAS_CONDA))
-		@echo ">>> Detected conda, creating conda environment."
-ifeq (3,$(findstring 3,$(PYTHON_INTERPRETER)))
-	conda create --name $(PROJECT_NAME) python=3
-else
-	conda create --name $(PROJECT_NAME) python=2.7
-endif
-		@echo ">>> New conda env created. Activate with:\nsource activate $(PROJECT_NAME)"
-else
-	@pip install -q virtualenv virtualenvwrapper
-	@echo ">>> Installing virtualenvwrapper if not already intalled.\nMake sure the following lines are in shell startup file\n\
-	export WORKON_HOME=$$HOME/.virtualenvs\nexport PROJECT_HOME=$$HOME/Devel\nsource /usr/local/bin/virtualenvwrapper.sh\n"
-	@bash -c "source `which virtualenvwrapper.sh`;mkvirtualenv $(PROJECT_NAME) --python=$(PYTHON_INTERPRETER)"
-	@echo ">>> New virtualenv created. Activate with:\nworkon $(PROJECT_NAME)"
-endif
+data-process: ## Processes the raw data and stores the processed result
+	@echo ">>> Processing the data"
+	# [NOTE] You can tailor the call below as needed
+	$(RUN_PRE) ./scripts/data.py process
 
-## Test python environment is setup correctly
-test_environment:
-	$(PYTHON_INTERPRETER) test_environment.py
+data-cook: ## Cooks the processed data and saves the results
+	@echo ">>> Cooking the data"
+	# [NOTE] You can tailor the call below as needed
+	$(RUN_PRE) ./scripts/data.py cook
 
-#################################################################################
-# PROJECT RULES                                                                 #
-#################################################################################
+# Media
 
+media-generate: ## Generates media files for the project
+	@echo ">>> Generating media files"
+	# [NOTE] You can tailor the call below as needed
+	$(RUN_PRE) ./scripts/media.py generate
 
+# Requirements
 
-#################################################################################
-# Self Documenting Commands                                                     #
-#################################################################################
+requirements: ## Installs Python dependencies
+	$(INSTALL_DEPENDENCIES)
 
-.DEFAULT_GOAL := show-help
+requirements-generate: ## Generates the project's requirements.txt file
+	$(GENERATE_DEPENDENCIES)
 
-# Inspired by <http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html>
-# sed script explained:
-# /^##/:
-# 	* save line in hold space
-# 	* purge line
-# 	* Loop:
-# 		* append newline + line to hold space
-# 		* go to next line
-# 		* if line starts with doc comment, strip comment character off and loop
-# 	* remove target prerequisites
-# 	* append hold space (+ newline) to line
-# 	* replace newline plus comments by `---`
-# 	* print line
-# Separate expressions are necessary because labels cannot be delimited by
-# semicolon; see <http://stackoverflow.com/a/11799865/1968>
-.PHONY: show-help
-show-help:
-	@echo "$$(tput bold)Available rules:$$(tput sgr0)"
-	@echo
-	@sed -n -e "/^## / { \
-		h; \
-		s/.*//; \
-		:doc" \
-		-e "H; \
-		n; \
-		s/^## //; \
-		t doc" \
-		-e "s/:.*//; \
-		G; \
-		s/\\n## /---/; \
-		s/\\n/ /g; \
-		p; \
-	}" ${MAKEFILE_LIST} \
-	| LC_ALL='C' sort --ignore-case \
-	| awk -F '---' \
-		-v ncol=$$(tput cols) \
-		-v indent=19 \
-		-v col_on="$$(tput setaf 6)" \
-		-v col_off="$$(tput sgr0)" \
-	'{ \
-		printf "%s%*s%s ", col_on, -indent, $$1, col_off; \
-		n = split($$2, words, " "); \
-		line_length = ncol - indent; \
-		for (i = 1; i <= n; i++) { \
-			line_length -= length(words[i]) + 1; \
-			if (line_length <= 0) { \
-				line_length = ncol - indent - length(words[i]) - 1; \
-				printf "\n%*s ", -indent, " "; \
-			} \
-			printf "%s ", words[i]; \
-		} \
-		printf "\n"; \
-	}' \
-	| more $(shell test $(shell uname) = Darwin && echo '--no-init --raw-control-chars')
+# Environment
+
+environment-create: ## Create a new Python virtual environment
+	@echo ">>> Creating new virtual environment for project"
+	$(CREATE_VENV)
+
+environment-remove: ## Removes the created Python virtual environment
+	@echo ">>> Removing the project virtual environment"
+	$(REMOVE_VENV)
+
+environment-test: ## Test python environment is setup correctly
+	$(PYTHON) test_environment.py
+
+# IPyKernel
+
+ipykernel-install: ## Creates an IPyKernel for this project's environment.
+	$(PYTHON) -m ipykernel install --user --name $(IPYK_NAME) --display-name "$(IPYK_DISPLAY_NAME)"
+
+ipykernel-uninstall: ## Removes the IPyKernel for this project's environment.
+	jupyter kernelspec remove $(IPYK_NAME)
+
+# Cleaning
+
+clean: ## Delete all compiled Python files or temp files
+	@rm -rf $(GARBAGE)
+
+clean-data: ## Deletes any processed data files/cooked data files
+	@echo ">>> Removing interim data files"
+	@rm -rf data/interim/*.*
+	@echo ">>> Removing processed data files"
+	@rm -rf data/processed/*.*
+	@echo ">>> Removing cooked data files"
+	@rm -rf data/cooked/*.*
+
+clean-media: ## Removes any generated media files
+	@echo ">>> Removing all media files"
+	@rm -rf media/*.*
+
+# Code
+
+lint: ## Lint using flake8
+	flake8 --exclude=env/,lib/,bin/,docs/conf.py .
+
+test: ## Run the unit tests over the project
+	$(UNIT_TEST) tests/

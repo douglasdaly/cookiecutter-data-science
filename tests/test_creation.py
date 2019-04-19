@@ -1,8 +1,20 @@
+"""
+test_creation code
+
+For running pytest on this cookiecutter project.
+
+"""
+#
+#   Imports
+#
 import os
 import shutil
-
 from cookiecutter import main
 import pytest
+
+#
+#   Variables
+#
 
 CCDS_ROOT = os.path.abspath(
                 os.path.join(
@@ -12,6 +24,10 @@ CCDS_ROOT = os.path.abspath(
                 )
             )
 
+
+#
+#   Test Functions
+#
 
 @pytest.fixture(scope='function')
 def default_baked_project(tmpdir):
@@ -76,7 +92,8 @@ def test_folders(default_baked_project):
         os.path.join('src', 'data'),
         os.path.join('src', 'features'),
         os.path.join('src', 'models'),
-        os.path.join('src', 'visualization')
+        os.path.join('src', 'visualization'),
+        'tests'
     ]
 
     ignored_dirs = [

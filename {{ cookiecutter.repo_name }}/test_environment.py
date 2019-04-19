@@ -1,9 +1,29 @@
+#!/usr/bin/env {{ cookiecutter.python_interpreter }}
+# -*- coding: utf-8 -*-
+"""
+Small script to test the newly created virtual environment.
+"""
+#
+#   Imports
+#
 import sys
 
-REQUIRED_PYTHON = "{{ cookiecutter.python_interpreter }}"
+import click
 
 
-def main():
+#
+#   Variables
+#
+
+REQUIRED_PYTHON = "{{ cookiecutter.python_interpreter }}".lower()
+
+
+#
+#   Script functions
+#
+
+@click.command()
+def cli():
     system_major = sys.version_info.major
     if REQUIRED_PYTHON == "python":
         required_major = 2
@@ -11,15 +31,18 @@ def main():
         required_major = 3
     else:
         raise ValueError("Unrecognized python interpreter: {}".format(
-            REQUIRED_PYTHON))
+            REQUIRED_PYTHON)
+        )
 
     if system_major != required_major:
         raise TypeError(
             "This project requires Python {}. Found: Python {}".format(
-                required_major, sys.version))
+                required_major, sys.version
+            )
+        )
     else:
-        print(">>> Development environment passes all tests!")
+        print(">>> Environment passes all tests")
 
 
 if __name__ == '__main__':
-    main()
+    cli()

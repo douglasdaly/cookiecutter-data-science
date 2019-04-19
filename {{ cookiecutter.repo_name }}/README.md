@@ -3,6 +3,7 @@
 
 {{cookiecutter.description}}
 
+
 Project Organization
 ------------
 
