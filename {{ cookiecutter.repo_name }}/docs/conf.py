@@ -17,9 +17,9 @@ sys.path.insert(0, os.path.abspath('../src/'))
 
 # -- Project information -----------------------------------------------------
 
-project = '{{ cookiecutter.project_name }}'
-copyright = '{% now "Y" %}, {{ cookiecutter.author_name }}'
-author = '{{ cookiecutter.author_name }}'
+project = u'{{ cookiecutter.project_name }}'
+copyright = u'{% now "local", "%Y" %}, {{ cookiecutter.author_name }}'
+author = u'{{ cookiecutter.author_name }}'
 
 # The full version, including alpha/beta/rc tags.
 release = '0.0.1'
