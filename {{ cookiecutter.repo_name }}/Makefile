@@ -24,7 +24,7 @@ GARBAGE := $(foreach DIR,$(DIRS),$(addprefix $(DIR)/,$(GARBAGE_PATTERNS)))
 
 ifeq ($(PKG_MGR), pipenv)
     RUN_PRE = pipenv run
-    INSTALL_DEPENDENCIES = pipenv install
+    INSTALL_DEPENDENCIES = pipenv install --dev
     GENERATE_DEPENDENCIES = pipenv lock -r > requirements.txt
     CREATE_VENV =
     REMOVE_VENV = pipenv --rm
@@ -62,29 +62,33 @@ help: ## Displays this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-30s\033[0m %s\n", $$1, $$2}'
 	@echo ''
 
+setup: environment-create requirements ipykernel-install ## Sets up a new environment for this project.
+
+teardown: ipykernel-uninstall environment-remove ## Tears down the environment for this project.
+
 # Data
 
 data-get: ## Gets the data and stores it locally
 	@echo ">>> Getting the data"
 	# [NOTE] You can tailor the call below as needed
-	$(RUN_PRE) ./scripts/data.py get
+	$(PYTHON) ./scripts/data.py get
 
 data-process: ## Processes the raw data and stores the processed result
 	@echo ">>> Processing the data"
 	# [NOTE] You can tailor the call below as needed
-	$(RUN_PRE) ./scripts/data.py process
+	$(PYTHON) ./scripts/data.py process
 
 data-cook: ## Cooks the processed data and saves the results
 	@echo ">>> Cooking the data"
 	# [NOTE] You can tailor the call below as needed
-	$(RUN_PRE) ./scripts/data.py cook
+	$(PYTHON) ./scripts/data.py cook
 
 # Media
 
 media-generate: ## Generates media files for the project
 	@echo ">>> Generating media files"
 	# [NOTE] You can tailor the call below as needed
-	$(RUN_PRE) ./scripts/media.py generate
+	$(PYTHON) ./scripts/media.py generate
 
 # Requirements
 

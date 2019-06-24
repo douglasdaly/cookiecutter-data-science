@@ -3,9 +3,6 @@
 """
 Script tools for getting and processing the project's data.
 """
-#
-#   Imports
-#
 import os
 import logging
 

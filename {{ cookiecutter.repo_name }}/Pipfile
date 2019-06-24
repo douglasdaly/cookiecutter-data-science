@@ -7,7 +7,7 @@ name = "pypi"
 click = "*"
 ipykernel = "*"
 requests = "*"
-"beautifulsoup4" = "*"
+requests_html = "*"
 tqdm = "*"
 numpy = "*"
 pandas = "*"
@@ -15,6 +15,13 @@ matplotlib = "*"
 scikit-learn = "*"
 scipy = "*"
 seaborn = "*"
+
+[dev-packages]
+coverage = "*"
+flake8 = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-xdist = "*"
 
 [requires]
 python_version = "{{ cookiecutter.python_version }}"

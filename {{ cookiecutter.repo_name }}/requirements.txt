@@ -1,9 +1,0 @@
-click
-sphinx
-coverage
-awscli
-flake8
-python-dotenv
-numpy
-pandas
-"beautifulsoup4"
